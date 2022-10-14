@@ -40,13 +40,21 @@ const createCustomElement = (element, className, innerText) => {
 const createProductItemElement = ({ id, title, thumbnail }) => {
   const section = document.createElement('section');
   section.className = 'item';
-
+  
   section.appendChild(createCustomElement('span', 'item_id', id));
   section.appendChild(createCustomElement('span', 'item__title', title));
   section.appendChild(createProductImageElement(thumbnail));
   section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
-
+  
   return section;
+};
+const appendProduct = async (query) => {
+  const sectionProducts = document.getElementsByClassName('items')[0];
+  const objectResult = await fetchProducts(query);
+  objectResult.map((item) => {
+    const product = createProductItemElement(item);
+    return sectionProducts.appendChild(product);
+  });
 };
 
 /**
@@ -72,4 +80,6 @@ const createCartItemElement = ({ id, title, price }) => {
   return li;
 };
 
-window.onload = () => { };
+window.onload = () => { 
+  appendProduct('computador');
+};

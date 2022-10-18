@@ -40,12 +40,12 @@ const createCustomElement = (element, className, innerText) => {
 const createProductItemElement = ({ id, title, thumbnail }) => {
   const section = document.createElement('section');
   section.className = 'item';
-  
+
   section.appendChild(createCustomElement('span', 'item_id', id));
   section.appendChild(createCustomElement('span', 'item__title', title));
   section.appendChild(createProductImageElement(thumbnail));
   section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
-  
+
   return section;
 };
 
@@ -66,8 +66,26 @@ const appendProduct = async (query) => {
  */
 const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
 
+const cartItems = document.querySelector('.cart__items');
+
+const sumCartPrices = (productsData) => {
+  let sum = 0;
+  productsData.forEach((li) => {
+    sum += Number(li.id); 
+  });
+  return Math.round(sum);
+};
+
+const getTotalPrice = () => {
+  const productsData = document.querySelectorAll('.cart__item');
+  const totalPrice = sumCartPrices(productsData);
+  const htmlPrice = document.querySelector('.total-price');
+  htmlPrice.innerHTML = `Preço Total: R$ ${totalPrice},00`;
+};
+
 const cartItemClickListener = (event) => {
   event.target.remove();
+  getTotalPrice();
 };
 
 /**
@@ -82,18 +100,19 @@ const createCartItemElement = ({ id, title, price }) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
+  li.id = `${price}`;
   li.addEventListener('click', cartItemClickListener);
   return li;
 };
 
 const addProductToCart = async () => {
   const buttonsProduct = document.querySelectorAll('.item__add');
-  const cartItems = document.querySelector('.cart__items');
   buttonsProduct.forEach((button) => {
     button.addEventListener('click', async (event) => {
       const productId = event.target.parentNode.firstChild.innerText;
       const productData = await fetchItem(productId);
       cartItems.appendChild(createCartItemElement(productData));
+      getTotalPrice();
     });
   });
 };
@@ -101,13 +120,14 @@ const addProductToCart = async () => {
 const clearCartItems = () => {
   const buttonClear = document.querySelector('.empty-cart');
   buttonClear.addEventListener('click', () => {
-    const cartItems = document.querySelector('.cart__items');
     cartItems.innerText = '';
+    getTotalPrice();
   });
 };
 
-window.onload = async () => { 
+window.onload = async () => {
   await appendProduct('computador');
   await addProductToCart();
   clearCartItems();
+  getTotalPrice();
 };

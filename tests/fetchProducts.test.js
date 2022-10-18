@@ -8,7 +8,7 @@ describe('1 - Teste a função fetchProducts', () => {
   })
   it ('fetch deve ser chamada ao passar o argumento computador para a função fetchProducts', async () => {
     await fetchProducts('computador');
-    expect(fetch).toHavebeenCalled();
+    expect(fetch).toHaveBeenCalled();
   })
   it ('fetch deve utilizar o endpoint "https://api.mercadolibre.com/sites/MLB/search?q=computador" com o argumento "computador"', async () => {
     await fetchProducts('computador');
@@ -19,7 +19,11 @@ describe('1 - Teste a função fetchProducts', () => {
     const returnedObject = await fetchProducts('computador');
     expect(returnedObject).toEqual(computadorSearch);
   })
-  it ('fetchProducts deve retornar um erro quando chamada sem argumentos',  async () => {
-    expect(await fetchProducts()).toThrow(new Error('You must provide an url!'));
+  it ('fetchProducts deve retornar um erro quando chamada sem argumentos', async () => {
+    try {
+      await fetchProducts();
+    } catch (error) {
+      expect(error).toEqual(new Error('You must provide an url!'));
+    }
   })
 });

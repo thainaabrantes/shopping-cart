@@ -48,10 +48,12 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
   
   return section;
 };
+
 const appendProduct = async (query) => {
   const sectionProducts = document.getElementsByClassName('items')[0];
-  const objectResult = await fetchProducts(query);
-  objectResult.map((item) => {
+  const data = await fetchProducts(query);
+  const { results } = data;
+  results.map((item) => {
     const product = createProductItemElement(item);
     return sectionProducts.appendChild(product);
   });
@@ -63,6 +65,10 @@ const appendProduct = async (query) => {
  * @returns {string} ID do produto.
  */
 const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
+
+const cartItemClickListener = (event) => {
+  event.target.remove();
+};
 
 /**
  * Função responsável por criar e retornar um item do carrinho.
@@ -80,6 +86,19 @@ const createCartItemElement = ({ id, title, price }) => {
   return li;
 };
 
-window.onload = () => { 
-  appendProduct('computador');
+const addProductToCart = async () => {
+  const buttonsProduct = document.querySelectorAll('.item__add');
+  const cartItems = document.querySelector('.cart__items');
+  buttonsProduct.forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      const productId = event.target.parentNode.firstChild.innerText;
+      const productData = await fetchItem(productId);
+      cartItems.appendChild(createCartItemElement(productData));
+    });
+  });
+};
+
+window.onload = async () => { 
+  await appendProduct('computador');
+  await addProductToCart();
 };

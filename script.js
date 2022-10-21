@@ -54,13 +54,6 @@ const appendProduct = async (query) => {
   });
 };
 
-/**
- * Função que recupera o ID do produto passado como parâmetro.
- * @param {Element} product - Elemento do produto.
- * @returns {string} ID do produto.
- */
-const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
-
 const cartItems = document.querySelector('.cart__items');
 
 const getTotalPrice = () => {

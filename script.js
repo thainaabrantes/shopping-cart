@@ -1,8 +1,3 @@
-// Esse tipo de comentário que estão antes de todas as funções são chamados de JSdoc,
-// experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições! 
-
-// Fique a vontade para modificar o código já escrito e criar suas próprias funções!
-
 /**
  * Função responsável por criar e retornar o elemento de imagem do produto.
  * @param {string} imageSource - URL da imagem.
@@ -71,7 +66,7 @@ const cartItems = document.querySelector('.cart__items');
 const sumCartPrices = (productsData) => {
   let sum = 0;
   productsData.forEach((li) => {
-    sum += Number(li.id); 
+    sum += Number(li.innerText.split('$')[1]);
   });
   return Math.round(sum);
 };
@@ -83,8 +78,15 @@ const getTotalPrice = () => {
   htmlPrice.innerHTML = `Preço Total: R$ ${totalPrice},00`;
 };
 
+const removeProductOfStorage = (product) => {
+  const productsOfStorage = JSON.parse(getSavedCartItems());
+  const savedProducts = productsOfStorage.filter((item) => item.id !== product.id);
+  saveCartItems(JSON.stringify(savedProducts));
+};
+
 const cartItemClickListener = (event) => {
   event.target.remove();
+  removeProductOfStorage(event.target);
   getTotalPrice();
 };
 
@@ -100,9 +102,29 @@ const createCartItemElement = ({ id, title, price }) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
-  li.id = `${price}`;
+  li.id = id;
   li.addEventListener('click', cartItemClickListener);
   return li;
+};
+
+const initialRendering = () => {
+  if (localStorage.cartItems) {
+    const productsOfStorage = JSON.parse(getSavedCartItems());
+    productsOfStorage.forEach((products) => {
+      cartItems.appendChild(createCartItemElement(products));
+    });
+  }
+};
+
+const addProductToStorage = (product) => {
+  const { id, title, price } = product;
+  if (localStorage.cartItems) {
+    const productsOfStorage = JSON.parse(getSavedCartItems());
+    productsOfStorage.push({ id, title, price });
+    saveCartItems(JSON.stringify(productsOfStorage));
+  } else {
+    saveCartItems(JSON.stringify([{ id, title, price }]));
+  }
 };
 
 const addProductToCart = async () => {
@@ -112,6 +134,7 @@ const addProductToCart = async () => {
       const productId = event.target.parentNode.firstChild.innerText;
       const productData = await fetchItem(productId);
       cartItems.appendChild(createCartItemElement(productData));
+      addProductToStorage(productData);
       getTotalPrice();
     });
   });
@@ -121,6 +144,7 @@ const clearCartItems = () => {
   const buttonClear = document.querySelector('.empty-cart');
   buttonClear.addEventListener('click', () => {
     cartItems.innerText = '';
+    localStorage.removeItem('cartItems');
     getTotalPrice();
   });
 };
@@ -128,6 +152,7 @@ const clearCartItems = () => {
 window.onload = async () => {
   await appendProduct('computador');
   await addProductToCart();
+  initialRendering();
   clearCartItems();
   getTotalPrice();
 };

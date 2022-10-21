@@ -63,19 +63,13 @@ const getIdFromProductItem = (product) => product.querySelector('span.id').inner
 
 const cartItems = document.querySelector('.cart__items');
 
-const sumCartPrices = (productsData) => {
+const getTotalPrice = () => {
   let sum = 0;
-  productsData.forEach((li) => {
+  cartItems.childNodes.forEach((li) => {
     sum += Number(li.innerText.split('$')[1]);
   });
-  return Math.round(sum);
-};
-
-const getTotalPrice = () => {
-  const productsData = document.querySelectorAll('.cart__item');
-  const totalPrice = sumCartPrices(productsData);
   const htmlPrice = document.querySelector('.total-price');
-  htmlPrice.innerHTML = `Preço Total: R$ ${totalPrice},00`;
+  htmlPrice.innerHTML = `Preço Total: R$ ${sum}`;
 };
 
 const removeProductOfStorage = (product) => {
